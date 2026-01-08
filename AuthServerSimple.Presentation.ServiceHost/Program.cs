@@ -19,12 +19,17 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+//Apply migrations
+await app.Services.ApplyMigrationsAsync();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
 
+//Https
+app.UseHsts();
 app.UseHttpsRedirection();
 
 app.Run();
