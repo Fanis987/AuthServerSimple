@@ -17,7 +17,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\AuthServerSimple.Dtos\AuthServerSimple.Dtos.csproj" />
       <ProjectReference Include="..\AuthServerSimple.Infrastructure.Identity\AuthServerSimple.Infrastructure.Identity.csproj" />
+      <ProjectReference Include="..\AuthServerSimple.Presentation.API\AuthServerSimple.Presentation.API.csproj" />
     </ItemGroup>
 
 </Project>
