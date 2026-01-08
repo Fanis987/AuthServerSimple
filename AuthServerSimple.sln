@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Presentation.ServiceHost", "AuthServerSimple.Presentation.ServiceHost\AuthServerSimple.Presentation.ServiceHost.csproj", "{2C3761FF-69CE-4DF0-BAE9-56E9E2B20746}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Infrastructure.Identity", "AuthServerSimple.Infrastructure.Identity\AuthServerSimple.Infrastructure.Identity.csproj", "{05941343-FEC4-411C-B645-05ED1A96AA39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{2C3761FF-69CE-4DF0-BAE9-56E9E2B20746}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C3761FF-69CE-4DF0-BAE9-56E9E2B20746}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C3761FF-69CE-4DF0-BAE9-56E9E2B20746}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05941343-FEC4-411C-B645-05ED1A96AA39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05941343-FEC4-411C-B645-05ED1A96AA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05941343-FEC4-411C-B645-05ED1A96AA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05941343-FEC4-411C-B645-05ED1A96AA39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
