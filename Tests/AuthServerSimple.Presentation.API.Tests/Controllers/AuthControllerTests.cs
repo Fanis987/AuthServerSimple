@@ -1,5 +1,6 @@
 using AuthServerSimple.Application.Interfaces;
 using AuthServerSimple.Dtos;
+using AuthServerSimple.Dtos.Requests;
 using AuthServerSimple.Dtos.Responses;
 using AuthServerSimple.Infrastructure.Identity;
 using AuthServerSimple.Presentation.API.Controllers;
@@ -45,8 +46,10 @@ public class AuthControllerTests
     public async Task Register_ReturnsOk_WhenRegistrationSucceeds()
     {
         // Arrange
-        var request = new RegisterRequest("test@example.com", "Password123!");
+        var request = new RegisterRequest("test@example.com", "Password123!", "Admin");
         A.CallTo(() => _userManager.CreateAsync(A<ApplicationUser>.Ignored, request.Password))
+            .Returns(IdentityResult.Success);
+        A.CallTo(() => _userManager.AddToRoleAsync(A<ApplicationUser>.Ignored, request.Role))
             .Returns(IdentityResult.Success);
 
         // Act
@@ -63,7 +66,7 @@ public class AuthControllerTests
     public async Task Register_ReturnsBadRequest_WhenRegistrationFails()
     {
         // Arrange
-        var request = new RegisterRequest("test@example.com", "Password123!");
+        var request = new RegisterRequest("test@example.com", "Password123!", "Admin");
         var errors = new[] { new IdentityError { Description = "Error 1" }, new IdentityError { Description = "Error 2" } };
         A.CallTo(() => _userManager.CreateAsync(A<ApplicationUser>.Ignored, request.Password))
             .Returns(IdentityResult.Failed(errors));
@@ -77,6 +80,26 @@ public class AuthControllerTests
         Assert.False(response.IsSuccess);
         Assert.Contains("Error 1", response.Message);
         Assert.Contains("Error 2", response.Message);
+    }
+
+    [Fact]
+    public async Task Register_ReturnsBadRequest_WhenRoleAssignmentFails()
+    {
+        // Arrange
+        var request = new RegisterRequest("test@example.com", "Password123!", "Admin");
+        A.CallTo(() => _userManager.CreateAsync(A<ApplicationUser>.Ignored, request.Password))
+            .Returns(IdentityResult.Success);
+        A.CallTo(() => _userManager.AddToRoleAsync(A<ApplicationUser>.Ignored, request.Role))
+            .Returns(IdentityResult.Failed(new IdentityError { Description = "Role error" }));
+
+        // Act
+        var result = await _controller.Register(request);
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        var response = Assert.IsType<AuthResponse>(badRequestResult.Value);
+        Assert.False(response.IsSuccess);
+        Assert.Equal("Role error", response.Message);
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 using AuthServerSimple.Application.Interfaces;
 using AuthServerSimple.Dtos;
+using AuthServerSimple.Dtos.Requests;
 using AuthServerSimple.Dtos.Responses;
 using AuthServerSimple.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -30,6 +31,10 @@ public class AuthController : ControllerBase
         var result = await _userManager.CreateAsync(user, request.Password);
 
         if (result.Succeeded) {
+            var roleResult = await _userManager.AddToRoleAsync(user, request.Role);
+            if (!roleResult.Succeeded) {
+                return BadRequest(AuthResponse.Failure(string.Join(", ", roleResult.Errors.Select(e => e.Description))));
+            }
             return Ok(AuthResponse.Success("User registered successfully"));
         }
 

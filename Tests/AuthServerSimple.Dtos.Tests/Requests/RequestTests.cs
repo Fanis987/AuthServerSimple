@@ -1,3 +1,5 @@
+using AuthServerSimple.Dtos.Requests;
+
 namespace AuthServerSimple.Dtos.Tests.Requests;
 
 public class RequestTests
@@ -25,12 +27,14 @@ public class RequestTests
         // Arrange
         var email = "test@example.com";
         var password = "password123";
+        var role = "Admin";
 
         // Act
-        var request = new RegisterRequest(email, password);
+        var request = new RegisterRequest(email, password, role);
 
         // Assert
         Assert.Equal(email, request.Email);
         Assert.Equal(password, request.Password);
+        Assert.Equal(role, request.Role);
     }
 }
