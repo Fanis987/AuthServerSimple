@@ -13,6 +13,7 @@
     <ItemGroup>
       <ProjectReference Include="..\AuthServerSimple.Dtos\AuthServerSimple.Dtos.csproj" />
       <ProjectReference Include="..\AuthServerSimple.Infrastructure.Identity\AuthServerSimple.Infrastructure.Identity.csproj" />
+      <ProjectReference Include="..\AuthServerSimple.Application\AuthServerSimple.Application.csproj" />
     </ItemGroup>
 
 </Project>

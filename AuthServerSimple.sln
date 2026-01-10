@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Applicatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Application.Tests", "Tests\AuthServerSimple.Application.Tests\AuthServerSimple.Application.Tests.csproj", "{526FB400-1EE7-4910-8569-CABD075A1328}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Dtos.Tests", "Tests\AuthServerSimple.Dtos.Tests\AuthServerSimple.Dtos.Tests.csproj", "{59FC4F5A-DF32-4436-A717-FE222F8D0C35}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{526FB400-1EE7-4910-8569-CABD075A1328}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{526FB400-1EE7-4910-8569-CABD075A1328}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{526FB400-1EE7-4910-8569-CABD075A1328}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59FC4F5A-DF32-4436-A717-FE222F8D0C35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59FC4F5A-DF32-4436-A717-FE222F8D0C35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59FC4F5A-DF32-4436-A717-FE222F8D0C35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59FC4F5A-DF32-4436-A717-FE222F8D0C35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
