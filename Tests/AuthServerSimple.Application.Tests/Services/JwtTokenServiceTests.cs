@@ -15,12 +15,13 @@ public class JwtTokenServiceTests
 
     public JwtTokenServiceTests()
     {
-        _jwtOptions = new JwtOptions(
-            IssuerSigningKey: "super_secret_key_that_is_at_least_32_characters_long",
-            Issuer: "test_issuer",
-            Audience: "test_audience",
-            ExpiresInMinutes: 60
-        );
+        _jwtOptions = new JwtOptions()
+        {
+            IssuerSigningKey= "super_secret_key_that_is_at_least_32_characters_long",
+            Issuer= "test_issuer",
+            Audience= "test_audience",
+            ExpiresInMinutes= 60
+        };
 
         _jwtOptionsMock = A.Fake<IOptions<JwtOptions>>();
         A.CallTo(() => _jwtOptionsMock.Value).Returns(_jwtOptions);
