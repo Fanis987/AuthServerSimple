@@ -33,12 +33,12 @@ public class AuthController : ControllerBase
         if (result.Succeeded) {
             var roleResult = await _userManager.AddToRoleAsync(user, request.Role);
             if (!roleResult.Succeeded) {
-                return BadRequest(AuthResponse.Failure(string.Join(", ", roleResult.Errors.Select(e => e.Description))));
+                return BadRequest(RegisterResponse.Failure(string.Join(", ", roleResult.Errors.Select(e => e.Description))));
             }
-            return Ok(AuthResponse.Success("User registered successfully"));
+            return Ok(RegisterResponse.Success("User registered successfully"));
         }
 
-        return BadRequest(AuthResponse.Failure(string.Join(", ", result.Errors.Select(e => e.Description))));
+        return BadRequest(RegisterResponse.Failure(string.Join(", ", result.Errors.Select(e => e.Description))));
     }
 
     [HttpPost("login")]

@@ -57,7 +57,7 @@ public class AuthControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var response = Assert.IsType<AuthResponse>(okResult.Value);
+        var response = Assert.IsType<RegisterResponse>(okResult.Value);
         Assert.True(response.IsSuccess);
         Assert.Equal("User registered successfully", response.Message);
     }
@@ -76,7 +76,7 @@ public class AuthControllerTests
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        var response = Assert.IsType<AuthResponse>(badRequestResult.Value);
+        var response = Assert.IsType<RegisterResponse>(badRequestResult.Value);
         Assert.False(response.IsSuccess);
         Assert.Contains("Error 1", response.Message);
         Assert.Contains("Error 2", response.Message);
@@ -97,7 +97,7 @@ public class AuthControllerTests
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        var response = Assert.IsType<AuthResponse>(badRequestResult.Value);
+        var response = Assert.IsType<RegisterResponse>(badRequestResult.Value);
         Assert.False(response.IsSuccess);
         Assert.Equal("Role error", response.Message);
     }
