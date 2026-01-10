@@ -18,6 +18,8 @@ builder.Services.Configure<SeedOptions>(
     builder.Configuration.GetSection(SeedOptions.SeedOptionsSectionName));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 //Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
