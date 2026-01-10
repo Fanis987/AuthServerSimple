@@ -1,4 +1,6 @@
+using AuthServerSimple.Application.Interfaces;
 using AuthServerSimple.Application.Options;
+using AuthServerSimple.Application.Services;
 using AuthServerSimple.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 //Options
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.JwtOptionsSectionName));
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 //Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
