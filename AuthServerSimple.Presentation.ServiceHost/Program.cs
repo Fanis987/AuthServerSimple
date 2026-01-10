@@ -1,27 +1,15 @@
+using AuthServerSimple.Application;
 using AuthServerSimple.Application.Interfaces;
-using AuthServerSimple.Application.Options;
-using AuthServerSimple.Application.Services;
-using AuthServerSimple.Application.Validation;
 using AuthServerSimple.Infrastructure.Identity;
 using AuthServerSimple.Infrastructure.Identity.Repositories;
-using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Options
-builder.Services.Configure<JwtOptions>(
-    builder.Configuration.GetSection(JwtOptions.JwtOptionsSectionName));
-builder.Services.Configure<SeedOptions>(
-    builder.Configuration.GetSection(SeedOptions.SeedOptionsSectionName));
-
-// Services
-builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-
-// Validation
-builder.Services.AddValidatorsFromAssemblyContaining<CreateRoleRequestValidator>();
+// Application Layer: Options, Services & Validation
+builder.AddApplicationLayerDependencies();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
