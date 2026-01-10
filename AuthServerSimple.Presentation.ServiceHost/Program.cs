@@ -37,6 +37,9 @@ var app = builder.Build();
 //Apply migrations
 await app.Services.ApplyMigrationsAsync();
 
+//Seed roles
+await DbInitializer.SeedRolesAsync(app.Services);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
