@@ -13,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 //Options
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.JwtOptionsSectionName));
+builder.Services.Configure<SeedOptions>(
+    builder.Configuration.GetSection(SeedOptions.SeedOptionsSectionName));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 //Database
@@ -37,8 +39,9 @@ var app = builder.Build();
 //Apply migrations
 await app.Services.ApplyMigrationsAsync();
 
-//Seed roles
+//Seed roles and users
 await DbInitializer.SeedRolesAsync(app.Services);
+await DbInitializer.SeedUsersAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
