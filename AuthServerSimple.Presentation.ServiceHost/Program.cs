@@ -2,6 +2,7 @@ using AuthServerSimple.Application.Interfaces;
 using AuthServerSimple.Application.Options;
 using AuthServerSimple.Application.Services;
 using AuthServerSimple.Infrastructure.Identity;
+using AuthServerSimple.Infrastructure.Identity.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -16,6 +17,7 @@ builder.Services.Configure<JwtOptions>(
 builder.Services.Configure<SeedOptions>(
     builder.Configuration.GetSection(SeedOptions.SeedOptionsSectionName));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
