@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Dtos", "Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Presentation.API", "AuthServerSimple.Presentation.API\AuthServerSimple.Presentation.API.csproj", "{C7505EC9-0137-4582-AA60-53704B4A141F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Application", "AuthServerSimple.Application\AuthServerSimple.Application.csproj", "{6A5B6CDE-5789-428E-BCA8-1DCAA556564C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Application.Tests", "Tests\AuthServerSimple.Application.Tests\AuthServerSimple.Application.Tests.csproj", "{526FB400-1EE7-4910-8569-CABD075A1328}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,13 @@ Global
 		{C7505EC9-0137-4582-AA60-53704B4A141F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7505EC9-0137-4582-AA60-53704B4A141F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7505EC9-0137-4582-AA60-53704B4A141F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A5B6CDE-5789-428E-BCA8-1DCAA556564C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A5B6CDE-5789-428E-BCA8-1DCAA556564C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A5B6CDE-5789-428E-BCA8-1DCAA556564C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A5B6CDE-5789-428E-BCA8-1DCAA556564C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{526FB400-1EE7-4910-8569-CABD075A1328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{526FB400-1EE7-4910-8569-CABD075A1328}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{526FB400-1EE7-4910-8569-CABD075A1328}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{526FB400-1EE7-4910-8569-CABD075A1328}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
