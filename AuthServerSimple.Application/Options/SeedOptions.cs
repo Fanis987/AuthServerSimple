@@ -7,6 +7,7 @@ public class SeedOptions
 {
     public const string SeedOptionsSectionName = "SeedOptions";
     
+    public bool AddDefaults { get; set; } 
     public string SupportPassword { get; set; } = string.Empty;
     public string DevPassword { get; set; } = string.Empty;
     public string AdminPassword { get; set; } = string.Empty;

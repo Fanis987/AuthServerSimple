@@ -43,6 +43,9 @@ public static class DbInitializer
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var seedOptions = scope.ServiceProvider.GetRequiredService<IOptions<SeedOptions>>().Value;
 
+        // Check if seeding is requested
+        if (!seedOptions.AddDefaults) return;
+        
         // Verify proper loading of the seed options
         if (string.IsNullOrWhiteSpace(seedOptions.SupportPassword))
             throw new ApplicationException("No password found for the seeded support user. Check your appsettings.json");
