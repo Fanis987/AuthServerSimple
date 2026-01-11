@@ -1,5 +1,4 @@
 using AuthServerSimple.Application.Interfaces;
-using AuthServerSimple.Dtos;
 using AuthServerSimple.Dtos.Requests;
 using AuthServerSimple.Dtos.Responses;
 using AuthServerSimple.Infrastructure.Identity;
@@ -19,7 +18,7 @@ public class AuthController : ControllerBase
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IValidator<RegisterRequest> _registerValidator;
-    private readonly IValidator<LoginRequest> _loginValidator;
+    private readonly IValidator<TokenRequest> _loginValidator;
 
     public AuthController(
         UserManager<ApplicationUser> userManager, 
@@ -27,7 +26,7 @@ public class AuthController : ControllerBase
         SignInManager<ApplicationUser> signInManager, 
         IJwtTokenService jwtTokenService,
         IValidator<RegisterRequest> registerValidator,
-        IValidator<LoginRequest> loginValidator)
+        IValidator<TokenRequest> loginValidator)
     {
         _userManager = userManager;
         _roleRepository = roleRepository;
@@ -74,8 +73,8 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [HttpPost("token")]
+    public async Task<IActionResult> Login([FromBody] TokenRequest request)
     {
         //Validation
         var validationResult = await _loginValidator.ValidateAsync(request);
@@ -86,7 +85,7 @@ public class AuthController : ControllerBase
 
         try
         {
-            var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, request.RememberMe, lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, false, lockoutOnFailure: false);
             if (result.IsLockedOut)
             {
                 return Unauthorized(AuthResponse.Failure("User account locked out"));

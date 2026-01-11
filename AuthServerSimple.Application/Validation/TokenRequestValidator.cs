@@ -1,11 +1,12 @@
-using AuthServerSimple.Dtos;
+
+using AuthServerSimple.Dtos.Requests;
 using FluentValidation;
 
 namespace AuthServerSimple.Application.Validation;
 
-public class LoginRequestValidator : AbstractValidator<LoginRequest>
+public class TokenRequestValidator : AbstractValidator<TokenRequest>
 {
-    public LoginRequestValidator()
+    public TokenRequestValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
