@@ -31,10 +31,10 @@ Note: You can adapt the port, 5400 is chosen to avoid conficts with other postgr
     "IssuerSigningKey": "3q2+7wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
     "Issuer": "generic-idp",
     "Audiences" :[
-        "issue-tracker-endpoints",
+        "my-app-endpoints",
         "some-other-endpoints"
     ],
-"ExpiresInMinutes": 15
+ "ExpiresInMinutes": 15
 }
 ```
 
