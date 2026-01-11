@@ -124,7 +124,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsOkWithToken_WhenLoginSucceeds()
     {
         // Arrange
-        var request = new TokenRequest("test@example.com", "Password123!", "test-audience");
+        var request = new TokenRequest("test@example.com", "Password123!", "test-audience", 60);
         var user = new ApplicationUser { Id = "user-id", UserName = request.Email, Email = request.Email };
         var roles = new List<string> { "User" };
         var token = "generated-jwt-token";
@@ -135,7 +135,7 @@ public class AuthControllerTests
             .Returns(user);
         A.CallTo(() => _userManager.GetRolesAsync(user))
             .Returns(roles);
-        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience))
+        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience, 60))
             .Returns(token);
 
         // Act
@@ -153,7 +153,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsUnauthorized_WhenAccountLockedOut()
     {
         // Arrange
-        var request = new TokenRequest("test@example.com", "Password123!", "test-audience");
+        var request = new TokenRequest("test@example.com", "Password123!", "test-audience", 60);
         A.CallTo(() => _signInManager.PasswordSignInAsync(request.Email, request.Password, false, false))
             .Returns(Microsoft.AspNetCore.Identity.SignInResult.LockedOut);
 
@@ -171,7 +171,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsUnauthorized_WhenLoginFails()
     {
         // Arrange
-        var request = new TokenRequest("test@example.com", "wrong-password", "test-audience");
+        var request = new TokenRequest("test@example.com", "wrong-password", "test-audience", 60);
         A.CallTo(() => _signInManager.PasswordSignInAsync(request.Email, request.Password, false, false))
             .Returns(Microsoft.AspNetCore.Identity.SignInResult.Failed);
 
@@ -189,7 +189,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsUnauthorized_WhenUserNotFoundAfterSuccess()
     {
         // Arrange
-        var request = new TokenRequest("test@example.com", "Password123!", "test-audience");
+        var request = new TokenRequest("test@example.com", "Password123!", "test-audience", 60);
         A.CallTo(() => _signInManager.PasswordSignInAsync(request.Email, request.Password, false, false))
             .Returns(Microsoft.AspNetCore.Identity.SignInResult.Success);
         A.CallTo(() => _userManager.FindByEmailAsync(request.Email))
@@ -209,7 +209,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsBadRequest_WhenUserHasNoRoles()
     {
         // Arrange
-        var request = new TokenRequest("test@example.com", "Password123!", "test-audience");
+        var request = new TokenRequest("test@example.com", "Password123!", "test-audience", 60);
         var user = new ApplicationUser { Id = "user-id", UserName = request.Email, Email = request.Email };
         
         A.CallTo(() => _signInManager.PasswordSignInAsync(request.Email, request.Password, false, false))
@@ -257,7 +257,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsBadRequest_WhenValidationFails()
     {
         // Arrange
-        var request = new TokenRequest("", "", "");
+        var request = new TokenRequest("", "", "", 60);
         var validationFailures = new List<FluentValidation.Results.ValidationFailure>
         {
             new("Email", "Email is required.")
@@ -279,7 +279,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsBadRequest_WhenAudienceIsInvalid()
     {
         // Arrange
-        var request = new TokenRequest("test@example.com", "Password123!", "invalid-audience");
+        var request = new TokenRequest("test@example.com", "Password123!", "invalid-audience", 60);
         var user = new ApplicationUser { Id = "user-id", UserName = request.Email, Email = request.Email };
         var roles = new List<string> { "User" };
 
@@ -289,7 +289,7 @@ public class AuthControllerTests
             .Returns(user);
         A.CallTo(() => _userManager.GetRolesAsync(user))
             .Returns(roles);
-        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience))
+        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience, 60))
             .Returns((string?)null);
 
         // Act

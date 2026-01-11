@@ -11,14 +11,16 @@ public class RequestTests
         var email = "test@example.com";
         var password = "password123";
         var audience = "test-audience";
+        var duration = 60;
 
         // Act
-        var request = new TokenRequest(email, password, audience);
+        var request = new TokenRequest(email, password, audience, duration);
 
         // Assert
         Assert.Equal(email, request.Email);
         Assert.Equal(password, request.Password);
         Assert.Equal(audience, request.Audience);
+        Assert.Equal(duration, request.DurationInMinutes);
     }
 
     [Fact]

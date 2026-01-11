@@ -12,6 +12,7 @@ public interface IJwtTokenService
     /// <param name="userName">The name of the user.</param>
     /// <param name="roles">The roles assigned to the user.</param>
     /// <param name="requestedAudience">The audience this JWT is intended for</param>
+    /// <param name="durationInMinutes">The validity duration of JWT token in minutes</param>
     /// <returns>A string representation of the generated JWT token.</returns>
-    public string? GenerateToken(string userId, string userName, IEnumerable<string> roles, string requestedAudience);
+    public string? GenerateToken(string userId, string userName, IEnumerable<string> roles, string requestedAudience, int? durationInMinutes);
 }

@@ -38,7 +38,7 @@ public class JwtTokenServiceTests
         var roles = new[] { "Admin", "User" };
 
         // Act
-        var token = _sut.GenerateToken(userId, userName, roles, _jwtOptions.Audiences[0]);
+        var token = _sut.GenerateToken(userId, userName, roles, _jwtOptions.Audiences[0], 60);
 
         // Assert
         Assert.NotNull(token);
@@ -71,7 +71,7 @@ public class JwtTokenServiceTests
         var roles = Enumerable.Empty<string>();
 
         // Act
-        var token = _sut.GenerateToken(userId, userName, roles, _jwtOptions.Audiences[0]);
+        var token = _sut.GenerateToken(userId, userName, roles, _jwtOptions.Audiences[0], 60);
 
         // Assert
         Assert.NotNull(token);
@@ -94,7 +94,7 @@ public class JwtTokenServiceTests
         var invalidAudience = "invalid_audience";
 
         // Act
-        var token = _sut.GenerateToken(userId, userName, roles, invalidAudience);
+        var token = _sut.GenerateToken(userId, userName, roles, invalidAudience, 60);
 
         // Assert
         Assert.Null(token);

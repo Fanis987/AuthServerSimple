@@ -41,8 +41,7 @@ public class AuthController : ControllerBase
     {
         // Validation
         var validationResult = await _registerValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
+        if (!validationResult.IsValid) {
             return BadRequest(RegisterResponse.Failure(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
         }
         
@@ -94,8 +93,7 @@ public class AuthController : ControllerBase
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(request.Email);
-                if (user == null)
-                {
+                if (user == null) {
                     return Unauthorized(AuthResponse.Failure("Invalid login attempt"));
                 }
 
@@ -105,7 +103,8 @@ public class AuthController : ControllerBase
                     return BadRequest(AuthResponse.Failure("User has no roles"));
 
                 // Prepare and return the token
-                var token = _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience);
+                var token = _jwtTokenService.GenerateToken(
+                    user.Id, user.UserName!, roles, request.Audience,request.DurationInMinutes);
                 if (token == null) return BadRequest("invalid Audience");
 
                 return Ok(AuthResponse.Success("Login successful", token));

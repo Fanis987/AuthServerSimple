@@ -17,5 +17,9 @@ public class TokenRequestValidator : AbstractValidator<TokenRequest>
 
         RuleFor(x => x.Audience)
             .NotEmpty().WithMessage("Audience is required.");
+
+        RuleFor(x => x.DurationInMinutes)
+            .GreaterThan(0).WithMessage("Duration must be greater than 0.")
+            .When(x => x.DurationInMinutes.HasValue);
     }
 }
