@@ -5,8 +5,13 @@ using AuthServerSimple.Infrastructure.Identity.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog
+builder.Host.UseSerilog((builderContext, servicesProvider, configuration) =>
+    configuration.ReadFrom.Configuration(builderContext.Configuration));
 
 // Application Layer: Options, Services & Validation
 builder.AddApplicationLayerDependencies();
@@ -34,12 +39,15 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Apply migrations
+// Apply Db migrations
 await app.Services.ApplyMigrationsAsync();
 
 // Seed roles and (optionally) users 
 await DbInitializer.SeedRolesAsync(app.Services);
 await DbInitializer.SeedUsersAsync(app.Services);
+
+//Serilog
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
@@ -54,6 +62,7 @@ app.UseHttpsRedirection();
 // Auth
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
