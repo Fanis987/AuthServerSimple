@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using AuthServerSimple.Application.Interfaces;
 using AuthServerSimple.Domain;
 using AuthServerSimple.Dtos.Requests;
 using AuthServerSimple.Dtos.Responses;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthServerSimple.Presentation.API.Controllers;
@@ -11,10 +13,17 @@ namespace AuthServerSimple.Presentation.API.Controllers;
 public class RoleController : ControllerBase
 {
     private readonly IRoleRepository _roleRepository;
+    private readonly IValidator<CreateRoleRequest> _createRoleValidator;
+    private readonly IValidator<UpdateRoleRequest> _updateRoleValidator;
 
-    public RoleController(IRoleRepository roleRepository)
+    public RoleController(
+        IRoleRepository roleRepository,
+        IValidator<CreateRoleRequest> createRoleValidator,
+        IValidator<UpdateRoleRequest> updateRoleValidator)
     {
         _roleRepository = roleRepository;
+        _createRoleValidator = createRoleValidator;
+        _updateRoleValidator = updateRoleValidator;
     }
 
     [HttpGet]
@@ -35,6 +44,13 @@ public class RoleController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
     {
+        //Validation
+        var validationResult = await _createRoleValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
         try
         {
             var result = await _roleRepository.CreateRoleAsync(request.RoleName);
@@ -55,6 +71,13 @@ public class RoleController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleRequest request)
     {
+        //Validation
+        var validationResult = await _updateRoleValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
         try
         {
             var result = await _roleRepository.UpdateRoleAsync(request.OldRoleName, request.NewRoleName);
@@ -71,6 +94,10 @@ public class RoleController : ControllerBase
     [HttpDelete("{roleName}")]
     public async Task<IActionResult> DeleteRole(string roleName)
     {
+        //Validation
+        if(string.IsNullOrWhiteSpace(roleName)) 
+            return BadRequest(new ValidationResult("roleName cannot be empty"));
+        
         try
         {
             var result = await _roleRepository.DeleteRoleAsync(roleName);

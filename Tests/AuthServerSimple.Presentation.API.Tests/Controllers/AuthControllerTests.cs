@@ -5,6 +5,7 @@ using AuthServerSimple.Dtos.Responses;
 using AuthServerSimple.Infrastructure.Identity;
 using AuthServerSimple.Presentation.API.Controllers;
 using FakeItEasy;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,8 @@ public class AuthControllerTests
     
     // SUT
     private readonly AuthController _controller;
+    private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IValidator<LoginRequest> _loginValidator;
 
     public AuthControllerTests()
     {
@@ -38,8 +41,19 @@ public class AuthControllerTests
         }));
         
         _jwtTokenService = A.Fake<IJwtTokenService>();
+        _registerValidator = A.Fake<IValidator<RegisterRequest>>();
+        _loginValidator = A.Fake<IValidator<LoginRequest>>();
+
+        // Setup validators to pass by default unless explicitly configured in tests
+        var registerResult = new FluentValidation.Results.ValidationResult();
+        A.CallTo(() => _registerValidator.ValidateAsync(A<RegisterRequest>.Ignored, A<CancellationToken>.Ignored))
+            .Returns(registerResult);
+            
+        var loginResult = new FluentValidation.Results.ValidationResult();
+        A.CallTo(() => _loginValidator.ValidateAsync(A<LoginRequest>.Ignored, A<CancellationToken>.Ignored))
+            .Returns(loginResult);
         
-        _controller = new AuthController(_userManager, _signInManager, _jwtTokenService);
+        _controller = new AuthController(_userManager, _signInManager, _jwtTokenService, _registerValidator, _loginValidator);
     }
 
     [Fact]
@@ -209,5 +223,51 @@ public class AuthControllerTests
         var response = Assert.IsType<AuthResponse>(badRequestResult.Value);
         Assert.False(response.IsSuccess);
         Assert.Equal("User has no roles", response.Message);
+    }
+
+    [Fact]
+    public async Task Register_ReturnsBadRequest_WhenValidationFails()
+    {
+        // Arrange
+        var request = new RegisterRequest("", "", "");
+        var validationFailures = new List<FluentValidation.Results.ValidationFailure>
+        {
+            new("Email", "Email is required."),
+            new("Password", "Password is required.")
+        };
+        A.CallTo(() => _registerValidator.ValidateAsync(request, A<CancellationToken>.Ignored))
+            .Returns(new FluentValidation.Results.ValidationResult(validationFailures));
+
+        // Act
+        var result = await _controller.Register(request);
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        var response = Assert.IsType<RegisterResponse>(badRequestResult.Value);
+        Assert.False(response.IsSuccess);
+        Assert.Contains("Email is required.", response.Message);
+        Assert.Contains("Password is required.", response.Message);
+    }
+
+    [Fact]
+    public async Task Login_ReturnsBadRequest_WhenValidationFails()
+    {
+        // Arrange
+        var request = new LoginRequest("", "", false);
+        var validationFailures = new List<FluentValidation.Results.ValidationFailure>
+        {
+            new("Email", "Email is required.")
+        };
+        A.CallTo(() => _loginValidator.ValidateAsync(request, A<CancellationToken>.Ignored))
+            .Returns(new FluentValidation.Results.ValidationResult(validationFailures));
+
+        // Act
+        var result = await _controller.Login(request);
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        var response = Assert.IsType<AuthResponse>(badRequestResult.Value);
+        Assert.False(response.IsSuccess);
+        Assert.Contains("Email is required.", response.Message);
     }
 }

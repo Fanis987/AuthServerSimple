@@ -3,6 +3,7 @@ using AuthServerSimple.Dtos;
 using AuthServerSimple.Dtos.Requests;
 using AuthServerSimple.Dtos.Responses;
 using AuthServerSimple.Infrastructure.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,17 +17,33 @@ public class AuthController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IValidator<LoginRequest> _loginValidator;
 
-    public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenService jwtTokenService)
+    public AuthController(
+        UserManager<ApplicationUser> userManager, 
+        SignInManager<ApplicationUser> signInManager, 
+        IJwtTokenService jwtTokenService,
+        IValidator<RegisterRequest> registerValidator,
+        IValidator<LoginRequest> loginValidator)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
+        _registerValidator = registerValidator;
+        _loginValidator = loginValidator;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        //Validation
+        var validationResult = await _registerValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(RegisterResponse.Failure(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
+        }
+
         try
         {
             var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
@@ -53,6 +70,13 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
+        //Validation
+        var validationResult = await _loginValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(AuthResponse.Failure(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
+        }
+
         try
         {
             var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, request.RememberMe, lockoutOnFailure: false);
@@ -87,5 +111,4 @@ public class AuthController : ControllerBase
             return StatusCode(500, "An internal server error occurred.");
         }
     }
-    
 }
