@@ -1,4 +1,6 @@
+using System.Security.Authentication;
 using AuthServerSimple.Application.Interfaces;
+using AuthServerSimple.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,8 +24,10 @@ public class RoleRepository : IRoleRepository
     /// <inheritdoc/>
     public async Task<IdentityResult> CreateRoleAsync(string roleName)
     {
-        if (await _roleManager.RoleExistsAsync(roleName)) {
-            return IdentityResult.Failed(new IdentityError { Description = $"Role {roleName} already exists." });
+        // Check for the role name
+        var existingRole = await _roleManager.FindByNameAsync(roleName);
+        if (existingRole != null) {
+            throw new AuthServerException("The role already exists");
         }
 
         return await _roleManager.CreateAsync(new IdentityRole(roleName));
