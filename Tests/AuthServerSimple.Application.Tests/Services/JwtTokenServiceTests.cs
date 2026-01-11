@@ -3,13 +3,13 @@ using System.Security.Claims;
 using AuthServerSimple.Application.Options;
 using AuthServerSimple.Application.Services;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace AuthServerSimple.Application.Tests.Services;
 
 public class JwtTokenServiceTests
 {
-    private readonly IOptions<JwtOptions> _jwtOptionsMock;
     private readonly JwtOptions _jwtOptions;
     private readonly JwtTokenService _sut;
 
@@ -23,10 +23,11 @@ public class JwtTokenServiceTests
             ExpiresInMinutes= 60
         };
 
-        _jwtOptionsMock = A.Fake<IOptions<JwtOptions>>();
-        A.CallTo(() => _jwtOptionsMock.Value).Returns(_jwtOptions);
+        var jwtOptionsMock = A.Fake<IOptions<JwtOptions>>();
+        var loggerMock = A.Fake<ILogger<JwtTokenService>>();
+        A.CallTo(() => jwtOptionsMock.Value).Returns(_jwtOptions);
 
-        _sut = new JwtTokenService(_jwtOptionsMock);
+        _sut = new JwtTokenService(jwtOptionsMock, loggerMock);
     }
 
     [Fact]

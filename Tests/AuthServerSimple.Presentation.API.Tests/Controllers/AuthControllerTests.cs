@@ -8,6 +8,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace AuthServerSimple.Presentation.API.Tests.Controllers;
 
@@ -18,7 +19,7 @@ public class AuthControllerTests
     private readonly IRoleRepository _roleRepository;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IJwtTokenService _jwtTokenService;
-    
+
     // SUT
     private readonly AuthController _controller;
     private readonly IValidator<RegisterRequest> _registerValidator;
@@ -26,24 +27,23 @@ public class AuthControllerTests
 
     public AuthControllerTests()
     {
-        _userManager = A.Fake<UserManager<ApplicationUser>>(options => options.WithArgumentsForConstructor(new object[] 
-        { 
+        _userManager = A.Fake<UserManager<ApplicationUser>>(options => options.WithArgumentsForConstructor([
             A.Fake<IUserStore<ApplicationUser>>(), 
-            null!, null!, null!, null!, null!, null!, null!, null! 
-        }));
+            null!, null!, null!, null!, null!, null!, null!, null!
+        ]));
         
-        _signInManager = A.Fake<SignInManager<ApplicationUser>>(options => options.WithArgumentsForConstructor(new object[]
-        {
+        _signInManager = A.Fake<SignInManager<ApplicationUser>>(options => options.WithArgumentsForConstructor([
             _userManager,
             A.Fake<IHttpContextAccessor>(),
             A.Fake<IUserClaimsPrincipalFactory<ApplicationUser>>(),
             null!, null!, null!, null!
-        }));
+        ]));
         
         _jwtTokenService = A.Fake<IJwtTokenService>();
         _registerValidator = A.Fake<IValidator<RegisterRequest>>();
         _loginValidator = A.Fake<IValidator<TokenRequest>>();
         _roleRepository = A.Fake<IRoleRepository>();
+        var logger = A.Fake<ILogger<AuthController>>();
 
         // Setup validators to pass by default unless explicitly configured in tests
         var registerResult = new FluentValidation.Results.ValidationResult();
@@ -54,7 +54,7 @@ public class AuthControllerTests
         A.CallTo(() => _loginValidator.ValidateAsync(A<TokenRequest>.Ignored, A<CancellationToken>.Ignored))
             .Returns(loginResult);
         
-        _controller = new AuthController(_userManager,_roleRepository, _signInManager, _jwtTokenService, _registerValidator, _loginValidator);
+        _controller = new AuthController(_userManager,_roleRepository, _signInManager, _jwtTokenService, _registerValidator, _loginValidator, logger);
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public class AuthControllerTests
             .Returns(user);
         A.CallTo(() => _userManager.GetRolesAsync(user))
             .Returns(roles);
-        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience, 60))
+        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName, roles, request.Audience, 60))
             .Returns(token);
 
         // Act
@@ -289,8 +289,8 @@ public class AuthControllerTests
             .Returns(user);
         A.CallTo(() => _userManager.GetRolesAsync(user))
             .Returns(roles);
-        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience, 60))
-            .Returns((string?)null);
+        A.CallTo(() => _jwtTokenService.GenerateToken(user.Id, user.UserName, roles, request.Audience, 60))
+            .Returns(null);
 
         // Act
         var result = await _controller.Login(request);

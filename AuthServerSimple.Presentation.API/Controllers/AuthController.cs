@@ -5,6 +5,7 @@ using AuthServerSimple.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace AuthServerSimple.Presentation.API.Controllers;
 
@@ -19,6 +20,7 @@ public class AuthController : ControllerBase
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IValidator<RegisterRequest> _registerValidator;
     private readonly IValidator<TokenRequest> _loginValidator;
+    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         UserManager<ApplicationUser> userManager, 
@@ -26,7 +28,8 @@ public class AuthController : ControllerBase
         SignInManager<ApplicationUser> signInManager, 
         IJwtTokenService jwtTokenService,
         IValidator<RegisterRequest> registerValidator,
-        IValidator<TokenRequest> loginValidator)
+        IValidator<TokenRequest> loginValidator,
+        ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _roleRepository = roleRepository;
@@ -34,19 +37,26 @@ public class AuthController : ControllerBase
         _jwtTokenService = jwtTokenService;
         _registerValidator = registerValidator;
         _loginValidator = loginValidator;
+        _logger = logger;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        _logger.LogInformation("Registration attempt for user {Email}", request.Email);
         // Validation
         var validationResult = await _registerValidator.ValidateAsync(request);
         if (!validationResult.IsValid) {
-            return BadRequest(RegisterResponse.Failure(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
+            var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+            _logger.LogWarning("Registration validation failed for user {Email}: {Errors}", request.Email, errors);
+            return BadRequest(RegisterResponse.Failure(errors));
         }
         
         if (!await _roleRepository.RoleExistsAsync(request.Role))
+        {
+            _logger.LogWarning("Registration failed for user {Email}: Requested role {Role} does not exist", request.Email, request.Role);
             return BadRequest(RegisterResponse.Failure("Requested role does not exist"));
+        }
 
         // User Creation
         try
@@ -59,15 +69,21 @@ public class AuthController : ControllerBase
                 var roleResult = await _userManager.AddToRoleAsync(user, request.Role);
                 if (!roleResult.Succeeded)
                 {
-                    return BadRequest(RegisterResponse.Failure(string.Join(", ", roleResult.Errors.Select(e => e.Description))));
+                    var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    _logger.LogError("Failed to add role {Role} to user {Email}: {Errors}", request.Role, request.Email, roleErrors);
+                    return BadRequest(RegisterResponse.Failure(roleErrors));
                 }
+                _logger.LogInformation("User {Email} registered successfully with role {Role}", request.Email, request.Role);
                 return Ok(RegisterResponse.Success("User registered successfully"));
             }
 
-            return BadRequest(RegisterResponse.Failure(string.Join(", ", result.Errors.Select(e => e.Description))));
+            var creationErrors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogWarning("User creation failed for {Email}: {Errors}", request.Email, creationErrors);
+            return BadRequest(RegisterResponse.Failure(creationErrors));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "An error occurred during registration for user {Email}", request.Email);
             return StatusCode(500, "An internal server error occurred.");
         }
     }
@@ -75,11 +91,14 @@ public class AuthController : ControllerBase
     [HttpPost("token")]
     public async Task<IActionResult> Login([FromBody] TokenRequest request)
     {
+        _logger.LogInformation("Login attempt for user {Email}", request.Email);
         //Validation
         var validationResult = await _loginValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
-            return BadRequest(AuthResponse.Failure(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
+            var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+            _logger.LogWarning("Login validation failed for user {Email}: {Errors}", request.Email, errors);
+            return BadRequest(AuthResponse.Failure(errors));
         }
 
         try
@@ -87,6 +106,7 @@ public class AuthController : ControllerBase
             var result = await _signInManager.PasswordSignInAsync(request.Email, request.Password, false, lockoutOnFailure: false);
             if (result.IsLockedOut)
             {
+                _logger.LogWarning("Login failed for user {Email}: User account locked out", request.Email);
                 return Unauthorized(AuthResponse.Failure("User account locked out"));
             }
 
@@ -94,26 +114,37 @@ public class AuthController : ControllerBase
             {
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null) {
+                    _logger.LogError("Login succeeded for user {Email} but user not found in database", request.Email);
                     return Unauthorized(AuthResponse.Failure("Invalid login attempt"));
                 }
 
                 // Check for roles in the user
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles.Count == 0)
+                {
+                    _logger.LogWarning("Login failed for user {Email}: User has no roles", request.Email);
                     return BadRequest(AuthResponse.Failure("User has no roles"));
+                }
 
                 // Prepare and return the token
                 var token = _jwtTokenService.GenerateToken(
                     user.Id, user.UserName!, roles, request.Audience,request.DurationInMinutes);
-                if (token == null) return BadRequest("invalid Audience");
+                if (token == null)
+                {
+                    _logger.LogWarning("Login failed for user {Email}: Invalid Audience {Audience}", request.Email, request.Audience);
+                    return BadRequest("invalid Audience");
+                }
 
+                _logger.LogInformation("User {Email} logged in successfully", request.Email);
                 return Ok(AuthResponse.Success("Login successful", token));
             }
 
+            _logger.LogWarning("Login failed for user {Email}: Invalid login attempt", request.Email);
             return Unauthorized(AuthResponse.Failure("Invalid login attempt"));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "An error occurred during login for user {Email}", request.Email);
             return StatusCode(500, "An internal server error occurred.");
         }
     }

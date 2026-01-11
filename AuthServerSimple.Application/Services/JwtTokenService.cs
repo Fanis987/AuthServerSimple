@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AuthServerSimple.Application.Interfaces;
 using AuthServerSimple.Application.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,20 +15,24 @@ namespace AuthServerSimple.Application.Services;
 public class JwtTokenService : IJwtTokenService
 {
     private readonly JwtOptions _jwtOptions;
+    private readonly ILogger<JwtTokenService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JwtTokenService"/> class.
     /// </summary>
     /// <param name="jwtOptions">The JWT configuration options.</param>
-    public JwtTokenService(IOptions<JwtOptions> jwtOptions)
+    /// <param name="logger">The logger instance.</param>
+    public JwtTokenService(IOptions<JwtOptions> jwtOptions, ILogger<JwtTokenService> logger)
     {
         _jwtOptions = jwtOptions.Value;
+        _logger = logger;
     }
 
     /// <inheritdoc />
     public string? GenerateToken(string userId, string userName, 
         IEnumerable<string> roles, string requestedAudience, int? durationInMinutes = null)
     {
+        _logger.LogInformation("Generating token for user {UserName} ({UserId}) with requested audience {RequestedAudience}", userName, userId, requestedAudience);
         // Choosing claims
         var claims = new List<Claim>
         {
@@ -50,7 +55,11 @@ public class JwtTokenService : IJwtTokenService
             }
         }
 
-        if (audience == null) return null;
+        if (audience == null)
+        {
+            _logger.LogWarning("Token generation failed: requested audience {RequestedAudience} is not valid.", requestedAudience);
+            return null;
+        }
         
         // Choosing Duration
         var durationInMin = durationInMinutes ?? _jwtOptions.ExpiresInMinutes;
@@ -64,6 +73,8 @@ public class JwtTokenService : IJwtTokenService
             signingCredentials: creds
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+        _logger.LogInformation("Token generated successfully for user {UserName}.", userName);
+        return tokenString;
     }
 }

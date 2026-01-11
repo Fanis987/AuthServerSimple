@@ -6,6 +6,7 @@ using FakeItEasy;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace AuthServerSimple.Presentation.API.Tests.Controllers;
 
@@ -21,6 +22,7 @@ public class RoleControllerTests
         _roleRepository = A.Fake<IRoleRepository>();
         _createRoleValidator = A.Fake<IValidator<CreateRoleRequest>>();
         _updateRoleValidator = A.Fake<IValidator<UpdateRoleRequest>>();
+        var logger = A.Fake<ILogger<RoleController>>();
 
         // Setup validators to pass by default
         A.CallTo(() => _createRoleValidator.ValidateAsync(A<CreateRoleRequest>.Ignored, A<CancellationToken>.Ignored))
@@ -28,7 +30,7 @@ public class RoleControllerTests
         A.CallTo(() => _updateRoleValidator.ValidateAsync(A<UpdateRoleRequest>.Ignored, A<CancellationToken>.Ignored))
             .Returns(new FluentValidation.Results.ValidationResult());
 
-        _controller = new RoleController(_roleRepository, _createRoleValidator, _updateRoleValidator);
+        _controller = new RoleController(_roleRepository, _createRoleValidator, _updateRoleValidator, logger);
     }
 
     [Fact]
