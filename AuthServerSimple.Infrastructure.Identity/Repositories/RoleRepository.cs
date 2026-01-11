@@ -15,6 +15,9 @@ public class RoleRepository : IRoleRepository
         _roleManager = roleManager;
     }
 
+    public async Task<bool> RoleExistsAsync(string role)
+        => await _roleManager.RoleExistsAsync(role); 
+
     /// <inheritdoc/>
     public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
     {

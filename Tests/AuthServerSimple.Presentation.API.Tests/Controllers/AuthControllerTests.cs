@@ -16,6 +16,7 @@ public class AuthControllerTests
 {
     // Dependencies
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IRoleRepository _roleRepository;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IJwtTokenService _jwtTokenService;
     
@@ -43,6 +44,7 @@ public class AuthControllerTests
         _jwtTokenService = A.Fake<IJwtTokenService>();
         _registerValidator = A.Fake<IValidator<RegisterRequest>>();
         _loginValidator = A.Fake<IValidator<LoginRequest>>();
+        _roleRepository = A.Fake<IRoleRepository>();
 
         // Setup validators to pass by default unless explicitly configured in tests
         var registerResult = new FluentValidation.Results.ValidationResult();
@@ -53,7 +55,7 @@ public class AuthControllerTests
         A.CallTo(() => _loginValidator.ValidateAsync(A<LoginRequest>.Ignored, A<CancellationToken>.Ignored))
             .Returns(loginResult);
         
-        _controller = new AuthController(_userManager, _signInManager, _jwtTokenService, _registerValidator, _loginValidator);
+        _controller = new AuthController(_userManager,_roleRepository, _signInManager, _jwtTokenService, _registerValidator, _loginValidator);
     }
 
     [Fact]
@@ -61,6 +63,7 @@ public class AuthControllerTests
     {
         // Arrange
         var request = new RegisterRequest("test@example.com", "Password123!", "Admin");
+        A.CallTo(() => _roleRepository.RoleExistsAsync("Admin")).Returns(true);
         A.CallTo(() => _userManager.CreateAsync(A<ApplicationUser>.Ignored, request.Password))
             .Returns(IdentityResult.Success);
         A.CallTo(() => _userManager.AddToRoleAsync(A<ApplicationUser>.Ignored, request.Role))
@@ -82,6 +85,7 @@ public class AuthControllerTests
         // Arrange
         var request = new RegisterRequest("test@example.com", "Password123!", "Admin");
         var errors = new[] { new IdentityError { Description = "Error 1" }, new IdentityError { Description = "Error 2" } };
+        A.CallTo(() => _roleRepository.RoleExistsAsync("Admin")).Returns(true);
         A.CallTo(() => _userManager.CreateAsync(A<ApplicationUser>.Ignored, request.Password))
             .Returns(IdentityResult.Failed(errors));
 
@@ -101,6 +105,7 @@ public class AuthControllerTests
     {
         // Arrange
         var request = new RegisterRequest("test@example.com", "Password123!", "Admin");
+        A.CallTo(() => _roleRepository.RoleExistsAsync("Admin")).Returns(true);
         A.CallTo(() => _userManager.CreateAsync(A<ApplicationUser>.Ignored, request.Password))
             .Returns(IdentityResult.Success);
         A.CallTo(() => _userManager.AddToRoleAsync(A<ApplicationUser>.Ignored, request.Role))

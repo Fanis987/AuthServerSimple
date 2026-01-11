@@ -15,6 +15,7 @@ public class AuthController : ControllerBase
 {
     //Dependencies
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IRoleRepository _roleRepository;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IValidator<RegisterRequest> _registerValidator;
@@ -22,12 +23,14 @@ public class AuthController : ControllerBase
 
     public AuthController(
         UserManager<ApplicationUser> userManager, 
+        IRoleRepository roleRepository,
         SignInManager<ApplicationUser> signInManager, 
         IJwtTokenService jwtTokenService,
         IValidator<RegisterRequest> registerValidator,
         IValidator<LoginRequest> loginValidator)
     {
         _userManager = userManager;
+        _roleRepository = roleRepository;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
         _registerValidator = registerValidator;
@@ -37,13 +40,17 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        //Validation
+        // Validation
         var validationResult = await _registerValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             return BadRequest(RegisterResponse.Failure(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
         }
+        
+        if (!await _roleRepository.RoleExistsAsync(request.Role))
+            return BadRequest(RegisterResponse.Failure("Requested role does not exist"));
 
+        // User Creation
         try
         {
             var user = new ApplicationUser { UserName = request.Email, Email = request.Email };

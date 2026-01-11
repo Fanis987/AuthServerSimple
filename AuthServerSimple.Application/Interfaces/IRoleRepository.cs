@@ -7,6 +7,9 @@ namespace AuthServerSimple.Application.Interfaces;
 /// </summary>
 public interface IRoleRepository
 {
+
+    public Task<bool> RoleExistsAsync(string role);
+    
     /// <summary>
     /// Gets all roles from the identity store.
     /// </summary>
