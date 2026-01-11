@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{89158EDA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Presentation.API.Tests", "Tests\AuthServerSimple.Presentation.API.Tests\AuthServerSimple.Presentation.API.Tests.csproj", "{7B7E238E-81C5-44C4-BABF-56DA8E13F45C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServerSimple.Domain", "AuthServerSimple.Domain\AuthServerSimple.Domain.csproj", "{FB194766-DDAA-449E-87CA-53C9357BDB05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{7B7E238E-81C5-44C4-BABF-56DA8E13F45C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B7E238E-81C5-44C4-BABF-56DA8E13F45C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B7E238E-81C5-44C4-BABF-56DA8E13F45C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB194766-DDAA-449E-87CA-53C9357BDB05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB194766-DDAA-449E-87CA-53C9357BDB05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB194766-DDAA-449E-87CA-53C9357BDB05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB194766-DDAA-449E-87CA-53C9357BDB05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{526FB400-1EE7-4910-8569-CABD075A1328} = {89158EDA-20DD-4624-8469-242D464B2788}
