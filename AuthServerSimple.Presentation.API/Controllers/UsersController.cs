@@ -17,7 +17,14 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {
-        var users = await _userRepository.GetAllUsersAsync();
-        return Ok(users);
+        try
+        {
+            var users = await _userRepository.GetAllUsersAsync();
+            return Ok(users);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An internal server error occurred.");
+        }
     }
 }

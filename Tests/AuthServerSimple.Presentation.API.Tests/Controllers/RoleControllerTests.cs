@@ -134,4 +134,19 @@ public class RoleControllerTests
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
         Assert.Equal(errors, badRequestResult.Value);
     }
+
+    [Fact]
+    public async Task GetAllRoles_ReturnsInternalServerError_WhenExceptionOccurs()
+    {
+        // Arrange
+        A.CallTo(() => _roleRepository.GetAllRolesAsync()).Throws(new Exception());
+
+        // Act
+        var result = await _controller.GetAllRoles();
+
+        // Assert
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, objectResult.StatusCode);
+        Assert.Equal("An internal server error occurred.", objectResult.Value);
+    }
 }
