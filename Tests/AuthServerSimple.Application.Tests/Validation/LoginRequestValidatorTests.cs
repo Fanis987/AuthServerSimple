@@ -11,7 +11,7 @@ public class LoginRequestValidatorTests
     [Fact]
     public void Should_Have_Error_When_Email_Is_Empty()
     {
-        var request = new LoginRequest("", "Password123!", false);
+        var request = new LoginRequest("", "Password123!", false, "test-audience");
         var result = _validator.Validate(request);
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == nameof(LoginRequest.Email) 
@@ -21,7 +21,7 @@ public class LoginRequestValidatorTests
     [Fact]
     public void Should_Have_Error_When_Email_Is_Invalid()
     {
-        var request = new LoginRequest("invalid-email", "Password123!", false);
+        var request = new LoginRequest("invalid-email", "Password123!", false, "test-audience");
         var result = _validator.Validate(request);
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == nameof(LoginRequest.Email) 
@@ -31,7 +31,7 @@ public class LoginRequestValidatorTests
     [Fact]
     public void Should_Have_Error_When_Password_Is_Empty()
     {
-        var request = new LoginRequest("test@example.com", "", false);
+        var request = new LoginRequest("test@example.com", "", false, "test-audience");
         var result = _validator.Validate(request);
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == nameof(LoginRequest.Password) 
@@ -41,8 +41,18 @@ public class LoginRequestValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_Request_Is_Valid()
     {
-        var request = new LoginRequest("test@example.com", "Password123!", false);
+        var request = new LoginRequest("test@example.com", "Password123!", false, "test-audience");
         var result = _validator.Validate(request);
         Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void Should_Have_Error_When_Audience_Is_Empty()
+    {
+        var request = new LoginRequest("test@example.com", "Password123!", false, "");
+        var result = _validator.Validate(request);
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == nameof(LoginRequest.Audience) 
+                                            && e.ErrorMessage == "Audience is required.");
     }
 }

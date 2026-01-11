@@ -106,7 +106,8 @@ public class AuthController : ControllerBase
                     return BadRequest(AuthResponse.Failure("User has no roles"));
 
                 // Prepare and return the token
-                var token = _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles);
+                var token = _jwtTokenService.GenerateToken(user.Id, user.UserName!, roles, request.Audience);
+                if (token == null) return BadRequest("invalid Audience");
 
                 return Ok(AuthResponse.Success("Login successful", token));
             }

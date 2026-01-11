@@ -25,7 +25,7 @@ public class JwtTokenService : IJwtTokenService
     }
 
     /// <inheritdoc />
-    public string GenerateToken(string userId, string userName, IEnumerable<string> roles)
+    public string? GenerateToken(string userId, string userName, IEnumerable<string> roles, string requestedAudience)
     {
         // Choosing claims
         var claims = new List<Claim>
@@ -39,10 +39,22 @@ public class JwtTokenService : IJwtTokenService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.IssuerSigningKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        // Choosing Audience 
+        string? audience = null;
+        foreach (var existingAudience in _jwtOptions.Audiences) {
+            if (requestedAudience == existingAudience)
+            {
+                audience = existingAudience;
+                break;
+            }
+        }
+
+        if (audience == null) return null;
+        
         // Token generation
         var token = new JwtSecurityToken(
             issuer: _jwtOptions.Issuer,
-            audience: _jwtOptions.Audience,
+            audience: audience,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiresInMinutes),
             signingCredentials: creds

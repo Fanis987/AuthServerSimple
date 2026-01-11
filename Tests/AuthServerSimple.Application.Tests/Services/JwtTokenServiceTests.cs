@@ -19,7 +19,7 @@ public class JwtTokenServiceTests
         {
             IssuerSigningKey= "super_secret_key_that_is_at_least_32_characters_long",
             Issuer= "test_issuer",
-            Audience= "test_audience",
+            Audiences= ["test_audience"],
             ExpiresInMinutes= 60
         };
 
@@ -38,7 +38,7 @@ public class JwtTokenServiceTests
         var roles = new[] { "Admin", "User" };
 
         // Act
-        var token = _sut.GenerateToken(userId, userName, roles);
+        var token = _sut.GenerateToken(userId, userName, roles, _jwtOptions.Audiences[0]);
 
         // Assert
         Assert.NotNull(token);
@@ -48,7 +48,7 @@ public class JwtTokenServiceTests
         var jsonToken = handler.ReadJwtToken(token);
 
         Assert.Equal(_jwtOptions.Issuer, jsonToken.Issuer);
-        Assert.Contains(_jwtOptions.Audience, jsonToken.Audiences);
+        Assert.Contains(_jwtOptions.Audiences[0], jsonToken.Audiences);
         
         var claims = jsonToken.Claims.ToList();
         Assert.Equal(userId, claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value);
@@ -71,9 +71,10 @@ public class JwtTokenServiceTests
         var roles = Enumerable.Empty<string>();
 
         // Act
-        var token = _sut.GenerateToken(userId, userName, roles);
+        var token = _sut.GenerateToken(userId, userName, roles, _jwtOptions.Audiences[0]);
 
         // Assert
+        Assert.NotNull(token);
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadJwtToken(token);
         
@@ -81,5 +82,21 @@ public class JwtTokenServiceTests
         // Allow for some delay in execution
         Assert.True(jsonToken.ValidTo > DateTime.UtcNow);
         Assert.True(jsonToken.ValidTo <= expectedExpiration.AddSeconds(5));
+    }
+
+    [Fact]
+    public void GenerateToken_ShouldReturnNull_WhenAudienceIsInvalid()
+    {
+        // Arrange
+        var userId = "123";
+        var userName = "testuser";
+        var roles = Enumerable.Empty<string>();
+        var invalidAudience = "invalid_audience";
+
+        // Act
+        var token = _sut.GenerateToken(userId, userName, roles, invalidAudience);
+
+        // Assert
+        Assert.Null(token);
     }
 }
