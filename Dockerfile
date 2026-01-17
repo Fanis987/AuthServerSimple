@@ -11,7 +11,6 @@ EXPOSE 5050
 
 # on runtime some env variables are expected to be overwritten via the CLI
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://localhost:5050
 
 # Seperate Stage for building 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build

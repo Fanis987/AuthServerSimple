@@ -23,6 +23,8 @@ services:
   api:
     image: authserversimple
     container_name: authserversimple-api
+    environment:
+      - ASPNETCORE_URLS=http://+:5050
     env_file:
       - .env.pseudo-prod
     ports:
