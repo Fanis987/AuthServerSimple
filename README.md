@@ -2,8 +2,11 @@
 
 A server built with .NET 10, designed to issue JWT tokens for different roles and audiences.   
 The project follows clean architecture, leveraging ASP.NET Core Identity for user management and Entity Framework Core
-with Postgres DB for data persistence. This project is aimed to assist in prototyping apps, deployment to production
-environment as-is is NOT encouraged.  
+with Postgres DB for data persistence. This project aims to assist in prototyping apps, deployment to a real production
+environment "as-is" is NOT encouraged.  
+
+The default containerized version of the API serves port 5050 with Http. For a more realistic setup it is
+advised to use a reverse proxy like nginx, which should also handle the TLS Termination.
 
 ## Features
 - **JWT Token Issuance**: Secure token generation with customizable traits.
@@ -16,7 +19,9 @@ environment as-is is NOT encouraged.
 **ALL CREDIENTIALS IS THE PROJECT ARE FOR DEMONSTRATION PURPOSES ONLY**    
 **ALWAYS STORE YOUR CREDENTIALS IN A SECURE ENVIRONMENT**    
 
-The application can be configured via `appsettings.json` or environment variables. Key sections include:
+The application can be configured via `appsettings.json` or `environment variables`, depending on the chosen setup
+
+Key sections in `appsettings.json` include:
 
 ### Connection Strings
 ```json
@@ -52,17 +57,43 @@ Note: Duration can be overwritten in the request to the `/token` endpoint
 }
 ```
 
-## Getting Started
+## Getting Started (Dotnet Devs)
+Assuming **docker AND dotnet** installation in the target machine:
 
 1.  **Clone the repository**.
-2. **Run postgres instance via docker** (or normally)
+2. **Run a postgres instance via docker**
    ```bash
    docker run -d --name authserver-db -e POSTGRES_USER=postgresUser -e POSTGRES_PASSWORD=postgresPw -e POSTGRES_DB=AuthServerSimpleDb -p 5400:5432 postgres:latest
    ```
 3. **Update Connection String**: Ensure your PostgreSQL instance is running and update the `DefaultConnection` in `appsettings.Development.json`.
-4. **Run the API** (will auto-apply DB migrations):
+4.  **Run the API** (will auto-apply DB migrations):
     ```bash
     dotnet run --project AuthServerSimple.Presentation.ServiceHost
+    ```
+Note: You can also run it in **Development** mode via IDE such as **Rider** or **Visual Studio**
+
+## Getting Started (Non-Dotnet Devs)
+Assuming **ONLY docker** installation in the target machine:
+1.  **Clone the repository**.
+2. **Build a docker image** of the Auth Server. ( Will take several mins, depending on your machine)
+    ```bash
+   docker build -t authserversimple:latest .
+   ```
+3. Prepare a env file `.env.pseudo-prod` in the root directory. Example below:
+    ```js
+    ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=AuthServerDb;Username=postgres;Password=secret
+    
+    JwtOptions__IssuerSigningKey=base64-key-here
+    JwtOptions__Issuer=generic-idp
+    JwtOptions__Audiences__0=some-endpoints
+    JwtOptions__ExpiresInMinutes=15
+    
+    SeedOptions__AddDefaults=false
+    ```
+4. Verify that your "authserversimple" image was built by running : `docker images`
+5. Start containers of postgres & authserver API, using the `docker-compose.yml` file, by running :
+    ```bash
+       docker compose up
     ```
 
 ## API Endpoints

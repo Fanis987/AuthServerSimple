@@ -1,5 +1,11 @@
-﻿# base layers with fundamental configurations
+﻿# base layers with fundamental configurations (Ubuntu-based image)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+
+# to work with postgres
+RUN apt-get update \
+    && apt-get install -y libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/* \
+
 WORKDIR /app
 EXPOSE 5050
 

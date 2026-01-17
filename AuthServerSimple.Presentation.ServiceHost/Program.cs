@@ -55,10 +55,6 @@ if (app.Environment.IsDevelopment()) {
     app.MapScalarApiReference();
 }
 
-// Https
-app.UseHsts();
-app.UseHttpsRedirection();
-
 // Auth
 app.UseAuthentication();
 app.UseAuthorization();
