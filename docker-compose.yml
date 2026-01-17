@@ -10,7 +10,7 @@ services:
       interval: 3s
       timeout: 3s
       retries: 3
-    container_name: postgres-db
+    container_name: db
     environment:
       POSTGRES_USER: postgresUser
       POSTGRES_PASSWORD: postgresPw
