@@ -10,8 +10,14 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Serilog
-builder.Host.UseSerilog((builderContext, servicesProvider, configuration) =>
-    configuration.ReadFrom.Configuration(builderContext.Configuration));
+builder.Host.UseSerilog((context, services, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+
+    // Overriding some system lib logging
+    config.MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning);
+    config.MinimumLevel.Override("System.Net.Http", Serilog.Events.LogEventLevel.Warning);
+});
 
 // Application Layer: Options, Services & Validation
 builder.AddApplicationLayerDependencies();
