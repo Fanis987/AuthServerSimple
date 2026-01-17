@@ -1,7 +1,9 @@
 # AuthServerSimple
 
 A server built with .NET 10, designed to issue JWT tokens for different roles and audiences.   
-The project follows clean architecture, leveraging ASP.NET Core Identity for user management and Entity Framework Core with Postgres DB for data persistence.  
+The project follows clean architecture, leveraging ASP.NET Core Identity for user management and Entity Framework Core
+with Postgres DB for data persistence. This project is aimed to assist in prototyping apps, deployment to production
+environment as-is is NOT encouraged.  
 
 ## Features
 - **JWT Token Issuance**: Secure token generation with customizable traits.
@@ -22,7 +24,7 @@ The application can be configured via `appsettings.json` or environment variable
   "DefaultConnection": "Host=localhost;Port=5400;Database=AuthServerSimpleDb;Username=postgresUser;Password=postgresPw"
 }
 ```
-Note: You can adapt the port, 5400 is chosen to avoid conficts with other postgres instances possibly running on port 5432
+Note: Port 5400 is randomly chosen to avoid conficts with other postgres instances possibly running on port 5432
 
 ### JWT Options
 **The options needed to issue the JWT tokens on token request**
@@ -37,6 +39,7 @@ Note: You can adapt the port, 5400 is chosen to avoid conficts with other postgr
  "ExpiresInMinutes": 15
 }
 ```
+Note: Duration can be overwritten in the request to the `/token` endpoint
 
 ### Seed Options
 **On startup, the app can optionally create three roles (Support,Dev,Admin) and a corresponding user for each role, based on the provided passwords**
@@ -81,7 +84,9 @@ Note: You can adapt the port, 5400 is chosen to avoid conficts with other postgr
     {
       "email": "user@example.com",
       "password": "YourSecurePassword123!",
-      "audience": "your-api-endpoints"
+      "rememberMe": true,
+      "audience": "your-api-endpoints",
+      "DurationInMinutes" : 30,
     }
     ```
   - **Response Body** (Success):
@@ -129,6 +134,10 @@ Note: You can adapt the port, 5400 is chosen to avoid conficts with other postgr
       {
         "email": "user@example.com",
         "roles": ["Dev", "Support"]
+      },
+      {
+        "Email": "test4@example.com",
+        "roles": ["testRole"]
       }
     ]
     ```
