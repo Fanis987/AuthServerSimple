@@ -17,7 +17,7 @@ public static class MigrationWorker
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Could not migrate");
+            throw new ApplicationException($"Exception occured during the migration: {ex.Message} {ex.StackTrace} ");
         }
     }
 }

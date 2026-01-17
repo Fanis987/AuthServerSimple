@@ -1,0 +1,35 @@
+networks:
+  authserversimple-net:
+    driver: bridge
+    
+services:
+  db:
+    image: postgres:latest
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgresUser -d AuthServerSimpleDb" ]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgresUser
+      POSTGRES_PASSWORD: postgresPw
+      POSTGRES_DB: AuthServerSimpleDb
+    ports:
+      - "5400:5432"
+    networks:
+      - authserversimple-net
+
+  api:
+    image: authserversimple
+    container_name: authserversimple-api
+    env_file:
+      - .env.pseudo-prod
+    ports:
+      - "5050:5050"
+    depends_on:
+      db:
+       condition: service_healthy
+    networks:
+      - authserversimple-net
+
